@@ -9,6 +9,10 @@ router.register(r'types', TypeView)
 router.register(r'statuses', StatusView)
 router.register(r'task-comments', TaskCommentView)
 router.register(r'task-comments-files', TaskCommentFileView)
+router.register(r'task-files', TaskFileView)
+router.register(r'importance-parameters', ImportanceParametersView)
+router.register(r'task-parameters', TaskParametersView)
+router.register(r'faq', FAQView)
 
 urlpatterns = [
     path('', include(router.urls)),

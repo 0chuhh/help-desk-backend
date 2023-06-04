@@ -23,6 +23,12 @@ class TaskView(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
+
+class ResolvedTasksView(viewsets.ModelViewSet):
+    pass
+
+
+
 class TypeView(viewsets.ModelViewSet):
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
@@ -91,7 +97,7 @@ class TaskCommentView(viewsets.ModelViewSet):
     queryset = TaskComment.objects.all()
     serializer_class = TaskCommentSerializer
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=True, methods=['get'])
     def by_task(self, request, pk=None):
@@ -100,14 +106,14 @@ class TaskCommentView(viewsets.ModelViewSet):
         serializer = TaskCommentSerializer(files, many=True)
         return Response(serializer.data)
 
-    # def get_permissions(self):
-    #     if self.action == 'delete':
-    #         permission_classes = [IsOwnerOrAdmin]
-    #     if self.action == 'update':
-    #         permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
-    #     else:
-    #         permission_classes = [permissions.IsAuthenticated]
-    #     return [permission() for permission in permission_classes]
+    def get_permissions(self):
+        if self.action == 'delete':
+            permission_classes = [IsOwnerOrAdmin]
+        if self.action == 'update':
+            permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 
 class TaskCommentFileView(viewsets.ModelViewSet):
@@ -129,5 +135,44 @@ class TaskCommentFileView(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
         else:
             permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+
+class TaskFileView(viewsets.ModelViewSet):
+    queryset = TaskFile.objects.all()
+    serializer_class = TaskFileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=True, methods=['get'])
+    def by_task(self, request, pk=None):
+        queryset = TaskCommentFile.objects.all()
+        files = get_list_or_404(queryset, task_id=pk)
+        serializer = TaskCommentFileSerializer(files, many=True)
+        return Response(serializer.data)
+
+    def get_permissions(self):
+        if self.action == 'delete':
+            permission_classes = [IsOwnerOrAdmin]
+        if self.action == 'update':
+            permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+
+class FAQView(viewsets.ModelViewSet):
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer
+    permission_classes = []
+
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [permissions.IsAdminUser]
+        if self.action == 'update':
+            permission_classes = [permissions.IsAdminUser]
+        if self.action == 'delete':
+            permission_classes = [permissions.IsAdminUser]
+        else:
+            permission_classes = []
         return [permission() for permission in permission_classes]
 # Create your views here.
