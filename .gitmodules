@@ -1,0 +1,3 @@
+[submodule "help-desk-frontend"]
+	path = help-desk-frontend
+	url = https://github.com/0chuhh/help-desk-frontend.git
