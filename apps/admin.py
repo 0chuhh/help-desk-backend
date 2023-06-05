@@ -1,9 +1,10 @@
 from django.contrib import admin
 from .models import Type, Task, Status, ImportanceParameters,\
-    FAQ, TaskFile, TaskCommentFile, TaskComment, TaskParameters
+    FAQ, TaskFile, TaskCommentFile, TaskComment, TaskParameters, UsersImage
 
 admin.site.register(Type)
 admin.site.register(Task)
+admin.site.register(UsersImage)
 admin.site.register(Status)
 admin.site.register(ImportanceParameters)
 admin.site.register(FAQ)

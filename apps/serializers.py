@@ -13,6 +13,7 @@ class UserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     username = serializers.CharField(max_length=100)
     password = serializers.CharField(max_length=100)
+    image = serializers.ImageField(required=False)
     groups = GroupSerializer(many=True, read_only=True, required=False)
     class Meta:
         model = User

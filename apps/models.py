@@ -2,6 +2,18 @@ from django.db import models
 from django.conf import settings
 
 
+class UsersImage(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='пользователь')
+    image = models.ImageField(upload_to='media/', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Фото пользователя'
+        verbose_name_plural = 'Фото пользователей'
+
+    def __str__(self):
+        return f'{self.user.username} - {self.image}'
+
+
 class Status(models.Model):
     name = models.CharField(max_length=50)
 
@@ -108,7 +120,7 @@ class TaskFile(models.Model):
 class FAQ(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
-    resolved_task = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL)
+    resolved_task = models.ForeignKey(Task, null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = 'Часто задаваемый вопрос'

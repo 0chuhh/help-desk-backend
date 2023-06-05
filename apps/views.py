@@ -22,13 +22,25 @@ class UsersView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.Generi
             user = request.user
             token = Token.objects.get(user=user)
             groups = GroupSerializer(request.user.groups.all(), many=True)
-            return Response({
-                'token': token.key,
-                'user_id': user.pk,
-                'email': user.email,
-                'username': user.username,
-                'roles': groups.data
-            })
+            try:
+                image = UsersImage.objects.get(user=user)
+                return Response({
+                    'token': token.key,
+                    'user_id': user.pk,
+                    'email': user.email,
+                    'username': user.username,
+                    'roles': groups.data,
+                    'image': image.image.url
+                })
+            except:
+                return Response({
+                    'token': token.key,
+                    'user_id': user.pk,
+                    'email': user.email,
+                    'username': user.username,
+                    'roles': groups.data,
+                })
+
         except:
             return Response('Не авторизован',status=status.HTTP_401_UNAUTHORIZED)
     
