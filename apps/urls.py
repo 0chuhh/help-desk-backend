@@ -9,6 +9,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 router = routers.SimpleRouter()
 router.register(r'tasks', TaskView)
 router.register(r'types', TypeView)
+router.register(r'users', UsersView)
 router.register(r'statuses', StatusView)
 router.register(r'task-comments', TaskCommentView)
 router.register(r'task-comments-files', TaskCommentFileView)
@@ -18,7 +19,7 @@ router.register(r'task-parameters', TaskParametersView)
 router.register(r'faq', FAQView)
 
 urlpatterns = [
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    path('sign-in/', obtain_auth_token, name='api_token_auth'),
     path('', include(router.urls)),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

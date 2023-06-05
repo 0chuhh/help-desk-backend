@@ -1,5 +1,22 @@
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth.models import User, Group
+
+
+class GroupSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = Group
+        fields = ('name',)
+
+
+class UserSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    username = serializers.CharField(max_length=100)
+    password = serializers.CharField(max_length=100)
+    groups = GroupSerializer(many=True, read_only=True, required=False)
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 class TaskSerializer(serializers.ModelSerializer):

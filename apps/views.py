@@ -1,12 +1,65 @@
 import django_filters
 from django.shortcuts import render
-from rest_framework import permissions, viewsets, generics
+from rest_framework import permissions, viewsets, generics, mixins
 from .models import *
+from rest_framework import status
 from .serializers import *
 from rest_framework.decorators import action
 from .permissions import IsOwnerOrAdmin
 from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.response import Response
+from django.contrib.auth.models import User, Group
+from rest_framework.authtoken.models import Token
+
+
+class UsersView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    @action(detail=False, methods=['get'])
+    def me(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            token = Token.objects.get(user=user)
+            groups = GroupSerializer(request.user.groups.all(), many=True)
+            return Response({
+                'token': token.key,
+                'user_id': user.pk,
+                'email': user.email,
+                'username': user.username,
+                'roles': groups.data
+            })
+        except:
+            return Response('Не авторизован',status=status.HTTP_401_UNAUTHORIZED)
+    
+    @action(detail=False, methods=['post'])
+    def signUp(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.create_user(
+                email=serializer.data['email'],
+                username=serializer.data['username'],
+                password=serializer.data['password']
+            )
+            user.save()
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                'token': token.key,
+                'user_id': user.pk,
+                'email': user.email,
+                'username': user.username
+            }, status=status.HTTP_201_CREATED)
+        return Response('error')
+    
+    def get_permissions(self):
+        if self.action == 'delete':
+            permission_classes = [permissions.IsAdminUser]
+        if self.action == 'me':
+            permission_classes = [permissions.IsAuthenticated]
+        else:
+            permission_classes = []
+        return [permission() for permission in permission_classes]
+
 
 
 class TaskView(viewsets.ModelViewSet):
