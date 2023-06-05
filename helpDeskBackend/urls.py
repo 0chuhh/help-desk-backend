@@ -17,7 +17,6 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.conf.urls.static import static
 from django.conf import settings
-from rest_framework.authtoken.views import obtain_auth_token
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -40,7 +39,6 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/", include("apps.urls")),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
 
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

@@ -3,6 +3,9 @@ from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework import routers
 from .views import *
+from rest_framework.authtoken.views import obtain_auth_token
+
+
 router = routers.SimpleRouter()
 router.register(r'tasks', TaskView)
 router.register(r'types', TypeView)
@@ -15,6 +18,7 @@ router.register(r'task-parameters', TaskParametersView)
 router.register(r'faq', FAQView)
 
 urlpatterns = [
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('', include(router.urls)),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
