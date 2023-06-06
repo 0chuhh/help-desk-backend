@@ -29,6 +29,7 @@ class UsersView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.Generi
                     'user_id': user.pk,
                     'email': user.email,
                     'username': user.username,
+                    'isStaff':user.is_staff,
                     'roles': groups.data,
                     'image': image.image.url
                 })
@@ -37,6 +38,7 @@ class UsersView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.Generi
                     'token': token.key,
                     'user_id': user.pk,
                     'email': user.email,
+                    'isStaff':user.is_staff,
                     'username': user.username,
                     'roles': groups.data,
                 })

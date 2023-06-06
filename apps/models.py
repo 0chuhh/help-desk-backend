@@ -120,7 +120,9 @@ class TaskFile(models.Model):
 class FAQ(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
-    resolved_task = models.ForeignKey(Task, null=True, blank=True, on_delete=models.SET_NULL)
+    html = models.TextField(null=True, blank=True)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE)
+    resolved_task = models.ManyToManyField(Task, null=True, blank=True,)
 
     class Meta:
         verbose_name = 'Часто задаваемый вопрос'
