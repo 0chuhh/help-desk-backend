@@ -71,4 +71,16 @@ class TaskFileSerializer(serializers.ModelSerializer):
 class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ
+        fields = ('id','name','description', 'type', 'resolved_task')
+
+
+class FAQDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = ('id','name','description', 'type', 'resolved_task', 'html')
+
+
+class FAQFilesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQFiles
         fields = '__all__'

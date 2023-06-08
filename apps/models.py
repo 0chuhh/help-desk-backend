@@ -4,7 +4,7 @@ from django.conf import settings
 
 class UsersImage(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='пользователь')
-    image = models.ImageField(upload_to='media/', null=True, blank=True)
+    image = models.ImageField(upload_to='media/users/images/', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Фото пользователя'
@@ -95,7 +95,7 @@ class TaskComment(models.Model):
 
 class TaskCommentFile(models.Model):
     comment = models.ForeignKey(TaskComment, on_delete=models.CASCADE)
-    file = models.FileField(upload_to='media/')
+    file = models.FileField(upload_to='media/task-comment/files/')
 
     class Meta:
         verbose_name = 'Файл комментариев'
@@ -107,7 +107,7 @@ class TaskCommentFile(models.Model):
 
 class TaskFile(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    file = models.FileField(upload_to='media/')
+    file = models.FileField(upload_to='media/task/files/')
 
     class Meta:
         verbose_name = 'Файл задач'
@@ -130,4 +130,17 @@ class FAQ(models.Model):
 
     def __str__(self):
         return f'{self.id} - {self.name}'
+    
+
+class FAQFiles(models.Model):
+    faq = models.ForeignKey(FAQ, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, null=True, blank=True, default='')
+    file = models.FileField(upload_to='media/faq/files/')
+
+    class Meta:
+        verbose_name = 'ЧаВо файл'
+        verbose_name_plural = 'ЧаВо файлы'
+
+    def __str__(self):
+        return f'{self.faq} - {self.name}'
 # Create your models here.

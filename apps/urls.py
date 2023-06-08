@@ -17,6 +17,7 @@ router.register(r'task-files', TaskFileView)
 router.register(r'importance-parameters', ImportanceParametersView)
 router.register(r'task-parameters', TaskParametersView)
 router.register(r'faq', FAQView)
+router.register(r'faq-files', FAQFilesView)
 
 urlpatterns = [
     path('sign-in/', obtain_auth_token, name='api_token_auth'),

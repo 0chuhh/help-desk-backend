@@ -232,6 +232,36 @@ class FAQView(viewsets.ModelViewSet):
     serializer_class = FAQSerializer
     permission_classes = []
 
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return FAQSerializer
+        return FAQDetailSerializer
+
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [permissions.IsAdminUser]
+        if self.action == 'update':
+            permission_classes = [permissions.IsAdminUser]
+        if self.action == 'delete':
+            permission_classes = [permissions.IsAdminUser]
+        else:
+            permission_classes = []
+        return [permission() for permission in permission_classes]
+    
+
+class FAQFilesView(viewsets.ModelViewSet):
+    queryset = FAQFiles.objects.all()
+    serializer_class = FAQFilesSerializer
+    permission_classes = []
+
+    @action(detail=True, methods=['get'])
+    def by_faq(self, request, pk=None):
+        queryset = FAQFiles.objects.all()
+        files = get_list_or_404(queryset, faq_id=pk)
+        serializer = FAQFilesSerializer(files, many=True)
+        return Response(serializer.data)
+
+
     def get_permissions(self):
         if self.action == 'create':
             permission_classes = [permissions.IsAdminUser]
