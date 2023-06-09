@@ -254,11 +254,22 @@ class FAQFilesView(viewsets.ModelViewSet):
     serializer_class = FAQFilesSerializer
     permission_classes = []
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get','post'])
     def by_faq(self, request, pk=None):
-        queryset = FAQFiles.objects.all()
-        files = get_list_or_404(queryset, faq_id=pk)
-        serializer = FAQFilesSerializer(files, many=True)
+        if request.method == 'GET':
+            queryset = FAQFiles.objects.all()
+            files = get_list_or_404(queryset, faq_id=pk)
+            serializer = FAQFilesSerializer(files, many=True)
+        if request.method == 'POST':
+            serializer = FAQFilesSerializer(data=request.data, many=True)
+            if serializer.is_valid():
+                if len(serializer.data)>1:
+                    for item in serializer.data:
+                        FAQFiles(*item)
+                        FAQFiles.save()
+                print(request.data)
+                print('HUI')
+                # FAQFiles.objects.create(**serializer.data)
         return Response(serializer.data)
 
 
