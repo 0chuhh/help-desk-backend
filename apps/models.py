@@ -133,9 +133,9 @@ class FAQ(models.Model):
     
 
 class FAQFiles(models.Model):
-    faq = models.ForeignKey(FAQ, on_delete=models.CASCADE)
+    faq = models.ForeignKey(FAQ, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100, null=True, blank=True, default='')
-    file = models.FileField(upload_to='media/faq/files/')
+    file = models.FileField(upload_to='media/faq/files/', null=True)
 
     class Meta:
         verbose_name = 'ЧаВо файл'

@@ -1,3 +1,4 @@
+import datetime
 import django_filters
 from django.shortcuts import render
 from rest_framework import permissions, viewsets, generics, mixins
@@ -257,20 +258,17 @@ class FAQFilesView(viewsets.ModelViewSet):
     @action(detail=True, methods=['get','post'])
     def by_faq(self, request, pk=None):
         if request.method == 'GET':
-            queryset = FAQFiles.objects.all()
-            files = get_list_or_404(queryset, faq_id=pk)
+            files = FAQFiles.objects.filter(faq_id=pk)
             serializer = FAQFilesSerializer(files, many=True)
+            return Response(serializer.data)
+
         if request.method == 'POST':
-            serializer = FAQFilesSerializer(data=request.data, many=True)
-            if serializer.is_valid():
-                if len(serializer.data)>1:
-                    for item in serializer.data:
-                        FAQFiles(*item)
-                        FAQFiles.save()
-                print(request.data)
-                print('HUI')
-                # FAQFiles.objects.create(**serializer.data)
-        return Response(serializer.data)
+            file_fields = request.FILES.getlist('file')
+            print(file_fields)
+            for file in file_fields:
+                new_file = FAQFiles(file=file, name=str(file).split('.')[0], faq_id=pk)
+                new_file.save()
+        return Response([])
 
 
     def get_permissions(self):
