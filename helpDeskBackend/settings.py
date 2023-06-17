@@ -77,17 +77,55 @@ TEMPLATES = [
     },
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.BasicAuthentication', # <-- And here
-    ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.TokenAuthentication',
+#         'rest_framework.authentication.BasicAuthentication', # <-- And here
+#     ],
+#     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+# }
+
+
+
+import ldap
+from django_auth_ldap.config import LDAPSearch, LDAPGroupQuery,GroupOfNamesType
+
+AUTH_LDAP_SERVER_URI = 'ldap://chitgu.local'
+AUTH_LDAP_BIND_DN = 'CN=Django Admin,CN=Users,DC=chitgu,DC=local'
+AUTH_LDAP_BIND_PASSWORD = 'MyPassword'
+AUTH_LDAP_USER_SEARCH = LDAPSearch('OU=all,OU=LSA_Users,DC=chitgu,DC=local',ldap.SCOPE_SUBTREE, '(sAMAccountName=%(user)s)')
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch('OU=HQ_Groups,DC=chitgu,DC=local',ldap.SCOPE_SUBTREE, '(objectClass=top)')
+AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+AUTH_LDAP_MIRROR_GROUPS = True
+
+# Populate the Django user from the LDAP directory.
+AUTH_LDAP_USER_ATTR_MAP = {
+    'username': 'sAMAccountName',
+    'first_name': 'displayName',
+    'last_name': 'sn',
+    'email': 'mail',
+}
+LOGIN_URL = 'login'
+
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    'is_active': 'CN=all, OU=HQ_Groups, DC=hqvfx, DC=com',
+    'is_staff': 'CN=all, OU=HQ_Groups, DC=hqvfx, DC=com',
+    'is_superuser': 'CN=all, OU=HQ_Groups, DC=hqvfx, DC=com',
 }
 
-
-WSGI_APPLICATION = 'helpDeskBackend.wsgi.application'
-
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+AUTH_LDAP_FIND_GROUP_PERMS = True
+AUTH_LDAP_CACHE_TIMEOUT = 3600
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

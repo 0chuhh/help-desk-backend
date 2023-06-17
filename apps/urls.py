@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework import routers
 from .views import *
 from rest_framework.authtoken.views import obtain_auth_token
-
+from django.contrib.auth.views import LoginView
 
 router = routers.SimpleRouter()
 router.register(r'tasks', TaskView)
@@ -22,5 +22,6 @@ router.register(r'faq-files', FAQFilesView)
 urlpatterns = [
     path('sign-in/', obtain_auth_token, name='api_token_auth'),
     path('', include(router.urls)),
+    path('login/', LoginView.as_view(),name='login'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
