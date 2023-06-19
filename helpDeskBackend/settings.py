@@ -88,14 +88,31 @@ TEMPLATES = [
 
 
 import ldap
-from django_auth_ldap.config import LDAPSearch, LDAPGroupQuery,GroupOfNamesType
+from django_auth_ldap.config import LDAPSearch, LDAPGroupQuery,GroupOfNamesType, NestedGroupOfNamesType
 
-AUTH_LDAP_SERVER_URI = 'ldap://chitgu.local'
-AUTH_LDAP_BIND_DN = 'CN=Django Admin,CN=Users,DC=chitgu,DC=local'
-AUTH_LDAP_BIND_PASSWORD = 'MyPassword'
-AUTH_LDAP_USER_SEARCH = LDAPSearch('OU=all,OU=LSA_Users,DC=chitgu,DC=local',ldap.SCOPE_SUBTREE, '(sAMAccountName=%(user)s)')
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch('OU=HQ_Groups,DC=chitgu,DC=local',ldap.SCOPE_SUBTREE, '(objectClass=top)')
-AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+
+LDAP_HOST = config("AUTH_LDAP_HOST")
+LDAP_DC = config("AUTH_LDAP_DOMAIN_COMPONENT")
+
+
+LDAP_BINDED_USER_GROUPS = config("AUTH_LDAP_BINDED_USER_GROUPS")
+
+LDAP_SEARCH_USERS_IN = config("AUTH_LDAP_SEARCH_USERS_IN")
+
+AUTH_LDAP_SERVER_URI = config("AUTH_LDAP_SERVER_URI")
+
+AUTH_LDAP_BIND_DN = f'{config("AUTH_LDAP_BIND_DN_USER")},{LDAP_BINDED_USER_GROUPS}, DC={LDAP_HOST},DC={LDAP_DC}'
+
+AUTH_LDAP_BIND_PASSWORD = config("AUTH_LDAP_BIND_PASSWORD")
+
+AUTH_LDAP_USER_SEARCH = LDAPSearch(f'{LDAP_SEARCH_USERS_IN}, DC={LDAP_HOST},DC={LDAP_DC}',ldap.SCOPE_SUBTREE, '(sAMAccountName=%(user)s)')
+
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+    f"{LDAP_SEARCH_USERS_IN},dc={LDAP_HOST},dc={LDAP_DC}", ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+)
+
+AUTH_LDAP_GROUP_TYPE = NestedGroupOfNamesType()
+
 AUTH_LDAP_MIRROR_GROUPS = True
 
 # Populate the Django user from the LDAP directory.
@@ -105,13 +122,13 @@ AUTH_LDAP_USER_ATTR_MAP = {
     'last_name': 'sn',
     'email': 'mail',
 }
-LOGIN_URL = 'login'
+LOGIN_URL = 'api/v1/sign-in/'
 
-AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-    'is_active': 'CN=all, OU=HQ_Groups, DC=hqvfx, DC=com',
-    'is_staff': 'CN=all, OU=HQ_Groups, DC=hqvfx, DC=com',
-    'is_superuser': 'CN=all, OU=HQ_Groups, DC=hqvfx, DC=com',
-}
+# AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+#     'is_active': 'CN=all, OU=HQ_Groups, DC=chitgu, DC=local',
+#     'is_staff': 'CN=all, OU=HQ_Groups, DC=chitgu, DC=local',
+#     'is_superuser': 'CN=all, OU=HQ_Groups, DC=chitgu, DC=local',
+# }
 
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
 AUTH_LDAP_FIND_GROUP_PERMS = True
@@ -126,7 +143,13 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
 }
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication', # <-- And here
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 

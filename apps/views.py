@@ -21,6 +21,7 @@ class UsersView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.Generi
     def me(self, request, *args, **kwargs):
         try:
             user = request.user
+            print(user)
             token = Token.objects.get(user=user)
             groups = GroupSerializer(request.user.groups.all(), many=True)
             try:
