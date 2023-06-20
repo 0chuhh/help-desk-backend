@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import ldap
+from django_auth_ldap.config import LDAPSearch, LDAPGroupQuery,GroupOfNamesType, NestedGroupOfNamesType
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,8 +88,64 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
-WSGI_APPLICATION = 'helpDeskBackend.wsgi.application'
+# ldap authentification
+
+LDAP_HOST = config("AUTH_LDAP_HOST")
+
+LDAP_DC = config("AUTH_LDAP_DOMAIN_COMPONENT")
+
+
+LDAP_BINDED_USER_GROUPS = config("AUTH_LDAP_BINDED_USER_GROUPS")
+
+LDAP_SEARCH_USERS_IN = config("AUTH_LDAP_SEARCH_USERS_IN")
+
+AUTH_LDAP_SERVER_URI = config("AUTH_LDAP_SERVER_URI")
+
+AUTH_LDAP_BIND_DN = f'{config("AUTH_LDAP_BIND_DN_USER")},{LDAP_BINDED_USER_GROUPS}, DC={LDAP_HOST},DC={LDAP_DC}'
+
+AUTH_LDAP_BIND_PASSWORD = config("AUTH_LDAP_BIND_PASSWORD")
+
+AUTH_LDAP_USER_SEARCH = LDAPSearch(f'{LDAP_SEARCH_USERS_IN}, DC={LDAP_HOST},DC={LDAP_DC}',ldap.SCOPE_SUBTREE, '(sAMAccountName=%(user)s)')
+
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+    f"{LDAP_SEARCH_USERS_IN},dc={LDAP_HOST},dc={LDAP_DC}", ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+)
+
+AUTH_LDAP_GROUP_TYPE = NestedGroupOfNamesType()
+
+AUTH_LDAP_MIRROR_GROUPS = True
+
+# Populate the Django user from the LDAP directory.
+AUTH_LDAP_USER_ATTR_MAP = {
+    'username': 'sAMAccountName',
+    'first_name': 'displayName',
+    'last_name': 'sn',
+    'email': 'mail',
+}
+LOGIN_URL = 'api/v1/sign-in/'
+
+# AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+#     'is_active': 'CN=all, OU=HQ_Groups, DC=chitgu, DC=local',
+#     'is_staff': 'CN=all, OU=HQ_Groups, DC=chitgu, DC=local',
+#     'is_superuser': 'CN=all, OU=HQ_Groups, DC=chitgu, DC=local',
+# }
+
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+AUTH_LDAP_FIND_GROUP_PERMS = True
+AUTH_LDAP_CACHE_TIMEOUT = 3600
+
+#logging to console
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
+}
 
 
 # Database
