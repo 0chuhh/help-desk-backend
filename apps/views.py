@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 from rest_framework.authtoken.models import Token
-
+from rest_framework import filters
 
 class UsersView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
@@ -235,6 +235,8 @@ class FAQView(viewsets.ModelViewSet):
     queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
     permission_classes = []
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
     def get_serializer_class(self):
         if self.action == 'list':
