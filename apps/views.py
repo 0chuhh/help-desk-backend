@@ -236,7 +236,7 @@ class FAQView(viewsets.ModelViewSet):
     serializer_class = FAQSerializer
     permission_classes = []
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    search_fields = ['name','description','type__name']
 
     def get_serializer_class(self):
         if self.action == 'list':
