@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import ldap
-from django_auth_ldap.config import LDAPSearch, LDAPGroupQuery,GroupOfNamesType, NestedGroupOfNamesType
+from django_auth_ldap.config import LDAPSearch, LDAPGroupQuery,GroupOfNamesType, NestedGroupOfNamesType,LDAPSearchUnion 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -112,11 +112,13 @@ AUTH_LDAP_BIND_PASSWORD = config("AUTH_LDAP_BIND_PASSWORD")
 
 AUTH_LDAP_USER_SEARCH = LDAPSearch(f'{LDAP_SEARCH_USERS_IN}, DC={LDAP_HOST},DC={LDAP_DC}',ldap.SCOPE_SUBTREE, '(sAMAccountName=%(user)s)')
 
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
-    f"{LDAP_SEARCH_USERS_IN},dc={LDAP_HOST},dc={LDAP_DC}", ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+AUTH_LDAP_GROUP_SEARCH = LDAPSearchUnion(
+    LDAPSearch(f"{LDAP_SEARCH_USERS_IN},dc={LDAP_HOST},dc={LDAP_DC}", ldap.SCOPE_SUBTREE, "(objectClass=group)"),
+    LDAPSearch(f"{LDAP_SEARCH_USERS_IN},dc={LDAP_HOST},dc={LDAP_DC}", ldap.SCOPE_SUBTREE, "(objectClass=organizationalUnit)"),
+    LDAPSearch(f"{LDAP_SEARCH_USERS_IN},dc={LDAP_HOST},dc={LDAP_DC}", ldap.SCOPE_SUBTREE, "(objectClass=top)")
 )
 
-AUTH_LDAP_GROUP_TYPE = NestedGroupOfNamesType()
+AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
 
 AUTH_LDAP_MIRROR_GROUPS = True
 
